@@ -74,15 +74,27 @@ class Game {
         this.joe.draw(this);
         this.flash.draw(this);
 
-        // Draw score counter
-        if (this.gameStarted && !this.gameOver) {
-            ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+        ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+        ctx.font = "40px sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "top";
+        if (!this.gameStarted) {
+            // Draw opening screen
+            ctx.fillRect(this.canvas.width / 2 - 200, 25, 400, 175);
+            ctx.fillStyle = "black";
+            ctx.fillText("Welcome to Flappy Joe!", this.canvas.width / 2, 35, 400);
+            ctx.fillText("Press SPACE to start", this.canvas.width / 2, 135, 400);
+        } else if (this.gameOver) {
+            // Draw game over screen
+            ctx.fillRect(this.canvas.width / 2 - 200, 25, 400, 175);
+            ctx.fillStyle = "black";
+            ctx.fillText("Game over!", this.canvas.width / 2, 35, 400);
+            ctx.fillText(`Total score: ${this.score}`, this.canvas.width / 2, 135, 400);
+        } else {
+            // Draw score counter
             ctx.fillRect(this.canvas.width / 2 - 100, 10, 200, 70);
             ctx.fillStyle = "black";
-            ctx.font = "40px sans-serif";
-            ctx.textAlign = "center";
-            ctx.textBaseline = "middle";
-            ctx.fillText(`Score: ${this.score}`, this.canvas.width / 2, 40, 200);
+            ctx.fillText(`Score: ${this.score}`, this.canvas.width / 2, 20, 200);
         }
     }
 
