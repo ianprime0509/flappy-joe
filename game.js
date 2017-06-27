@@ -19,7 +19,9 @@ var Game = (function () {
         this.highScore = 0;
         this._canvas = document.getElementById(canvasId);
         this._ctx = this.canvas.getContext("2d");
+        // http://goop.com/wp-content/uploads/2016/11/crystals-img7-1.jpg
         var bgTexture = document.getElementById("texture-bg");
+        // http://wallpapersafari.com/w/0HvG2Y/
         var floorTexture = document.getElementById("texture-floor");
         var joeTexture = document.getElementById("texture-joe");
         this.obstacleTexture = document.getElementById("texture-obstacle");

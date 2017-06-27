@@ -27,7 +27,9 @@ class Game {
         this._canvas = <HTMLCanvasElement>document.getElementById(canvasId);
         this._ctx = this.canvas.getContext("2d")!;
 
+        // http://goop.com/wp-content/uploads/2016/11/crystals-img7-1.jpg
         let bgTexture = <HTMLImageElement>document.getElementById("texture-bg");
+        // http://wallpapersafari.com/w/0HvG2Y/
         let floorTexture = <HTMLImageElement>document.getElementById("texture-floor");
         let joeTexture = <HTMLImageElement>document.getElementById("texture-joe");
 

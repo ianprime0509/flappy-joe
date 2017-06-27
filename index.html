@@ -6,8 +6,31 @@
     <title>Flappy Joe</title>
     <script src="game.js"></script>
     <style>
+        body {
+            display: flex;
+            height: 100%;
+            margin: 0;
+            width: 100%;
+        }
+
+        html {
+            height: 100%;
+            margin: 0;
+            width: 100%;
+        }
+
         .assets {
             display: none;
+            margin: 0;
+            padding: 0;
+        }
+
+        #canvas {
+            align-items: center;
+            display: block;
+            justify-content: center;
+            margin: auto;
+            padding: 0;
         }
     </style>
 </head>
@@ -18,9 +41,7 @@
     <div class="assets">
         <img id="texture-joe" src="assets/joe.png">
         <img id="texture-floor" src="assets/music.png">
-        <!-- http://goop.com/wp-content/uploads/2016/11/crystals-img7-1.jpg -->
         <img id="texture-bg" src="assets/crystals.jpg">
-        <!-- http://wallpapersafari.com/w/0HvG2Y/ -->
         <img id="texture-obstacle" src="assets/keys.png">
 
         <audio id="audio-theme" src="assets/pursuit.ogg"></audio>
