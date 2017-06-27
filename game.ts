@@ -15,6 +15,7 @@ class Game {
     private highScore: number = 0;
 
     private obstacleTexture: HTMLImageElement;
+    private backgroundMusic: HTMLAudioElement;
 
     private background: ScrollingObject;
     private flash: Flash;
@@ -31,6 +32,8 @@ class Game {
         let joeTexture = <HTMLImageElement>document.getElementById("texture-joe");
 
         this.obstacleTexture = <HTMLImageElement>document.getElementById("texture-obstacle");
+        this.backgroundMusic = <HTMLAudioElement>document.getElementById("audio-theme");
+        this.backgroundMusic.loop = true;
 
         this.background = new ScrollingObject(bgTexture, 0, 0, this.canvas.width, this.canvas.height, Game.VELOCITY / 2);
         this.floor = new Floor(this, floorTexture);
@@ -156,6 +159,8 @@ class Game {
             }
             this.flash.flash();
             this.gameOver = true;
+            this.backgroundMusic.pause();
+            this.backgroundMusic.currentTime = 0;
         }
     }
 
@@ -163,8 +168,10 @@ class Game {
         let code = e.keyCode;
         if (code == 32) {
             if (!this.gameStarted) {
+                // Start game
                 this.gameStarted = true;
                 this.joe.jump();
+                this.backgroundMusic.play();
             } else if (this.gameOver) {
                 // Restart the game
                 this.reset();
@@ -182,6 +189,7 @@ class Game {
         this.obstacles = [];
         this.score = 0;
         this.gameOver = false;
+        this.backgroundMusic.play();
     }
 }
 
