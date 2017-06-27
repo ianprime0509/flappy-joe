@@ -13,6 +13,8 @@ class Game {
     private nextObstacle: number = Game.OBSTACLE_TIME;
     private score: number = 0;
 
+    private obstacleTexture: HTMLImageElement;
+
     private background: ScrollingObject;
     private flash: Flash;
     private joe: Joe;
@@ -27,9 +29,11 @@ class Game {
         let floorTexture = <HTMLImageElement>document.getElementById("texture-floor");
         let joeTexture = <HTMLImageElement>document.getElementById("texture-joe");
 
+        this.obstacleTexture = <HTMLImageElement>document.getElementById("texture-obstacle");
+
         this.background = new ScrollingObject(bgTexture, 0, 0, this.canvas.width, this.canvas.height, Game.VELOCITY / 2);
         this.floor = new Floor(this, floorTexture);
-        this.obstacles = [new Obstacle(this)];
+        this.obstacles = [new Obstacle(this, this.obstacleTexture)];
         this.flash = new Flash(this);
         this.joe = new Joe(this, joeTexture);
 
@@ -70,9 +74,16 @@ class Game {
         this.joe.draw(this);
         this.flash.draw(this);
 
-        ctx.fillStyle = "red";
-        ctx.font = "40px sans-serif";
-        ctx.fillText(`Score: ${this.score}`, 100, 100);
+        // Draw score counter
+        if (this.gameStarted && !this.gameOver) {
+            ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
+            ctx.fillRect(this.canvas.width / 2 - 100, 10, 200, 70);
+            ctx.fillStyle = "black";
+            ctx.font = "40px sans-serif";
+            ctx.textAlign = "center";
+            ctx.textBaseline = "middle";
+            ctx.fillText(`Score: ${this.score}`, this.canvas.width / 2, 40, 200);
+        }
     }
 
     private update() {
@@ -112,7 +123,7 @@ class Game {
         }
         // Generate a new obstacle if necessary
         if (this.nextObstacle == 0) {
-            this.obstacles.push(new Obstacle(this));
+            this.obstacles.push(new Obstacle(this, this.obstacleTexture));
             this.nextObstacle = Game.OBSTACLE_TIME;
         } else {
             this.nextObstacle--;
@@ -202,30 +213,36 @@ class Floor extends ScrollingObject {
 }
 
 class ObstacleTop extends RectangularObject {
-    constructor(x: number, y: number, width: number, height: number) {
+    private texture: HTMLImageElement;
+
+    constructor(texture: HTMLImageElement, x: number, y: number, width: number, height: number) {
         super(x, y, width, height);
+        this.texture = texture;
     }
 
     public draw(game: Game) {
-        game.ctx.save();
-        game.ctx.fillStyle = "green";
-        game.ctx.fillRect(this.x, this.y, this.width, this.height);
-        game.ctx.restore();
+        // Draw texture tiling upwards
+        for (let y = this.y + this.height - this.texture.height; y + this.texture.height >= 0; y -= this.texture.height) {
+            game.ctx.drawImage(this.texture, this.x, y);
+        }
     }
 
     public update(game: Game) { }
 }
 
 class ObstacleBottom extends RectangularObject {
-    constructor(x: number, y: number, width: number, height: number) {
+    private texture: HTMLImageElement;
+
+    constructor(texture: HTMLImageElement, x: number, y: number, width: number, height: number) {
         super(x, y, width, height);
+        this.texture = texture;
     }
 
     public draw(game: Game) {
-        game.ctx.save();
-        game.ctx.fillStyle = "green";
-        game.ctx.fillRect(this.x, this.y, this.width, this.height);
-        game.ctx.restore();
+        // Draw texture tiling downwards
+        for (let y = this.y; y <= game.floor_y; y += this.texture.height) {
+            game.ctx.drawImage(this.texture, this.x, y);
+        }
     }
 
     public update(game: Game) { }
@@ -240,11 +257,11 @@ class Obstacle extends GameObject {
     /** Whether Joe has passed this obstacle. */
     public passed: boolean = false;
 
-    constructor(game: Game) {
-        super(game.canvas.width, 0, 100, game.canvas.height);
+    constructor(game: Game, texture: HTMLImageElement) {
+        super(game.canvas.width, 0, texture.width, game.canvas.height);
         let splitY = Math.random() * (game.floor_y - 100 - Obstacle.SPACING) + 50;
-        this.top = new ObstacleTop(this.x, this.y, this.width, splitY);
-        this.bottom = new ObstacleBottom(this.x, splitY + Obstacle.SPACING, this.width, this.height - splitY - Obstacle.SPACING);
+        this.top = new ObstacleTop(texture, this.x, this.y, this.width, splitY);
+        this.bottom = new ObstacleBottom(texture, this.x, splitY + Obstacle.SPACING, this.width, this.height - splitY - Obstacle.SPACING);
     }
 
     public draw(game: Game) {
