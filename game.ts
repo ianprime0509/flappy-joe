@@ -10,8 +10,9 @@ class Game {
     private gameStarted: boolean = false;
     private gameOver: boolean = false;
     /** Number of frames until the next obstacle. */
-    private nextObstacle: number = Game.OBSTACLE_TIME;
+    private nextObstacle: number = 0;
     private score: number = 0;
+    private highScore: number = 0;
 
     private obstacleTexture: HTMLImageElement;
 
@@ -33,7 +34,7 @@ class Game {
 
         this.background = new ScrollingObject(bgTexture, 0, 0, this.canvas.width, this.canvas.height, Game.VELOCITY / 2);
         this.floor = new Floor(this, floorTexture);
-        this.obstacles = [new Obstacle(this, this.obstacleTexture)];
+        this.obstacles = [];
         this.flash = new Flash(this);
         this.joe = new Joe(this, joeTexture);
 
@@ -86,10 +87,12 @@ class Game {
             ctx.fillText("Press SPACE to start", this.canvas.width / 2, 135, 400);
         } else if (this.gameOver) {
             // Draw game over screen
-            ctx.fillRect(this.canvas.width / 2 - 200, 25, 400, 175);
+            ctx.fillRect(this.canvas.width / 2 - 200, 25, 400, 325);
             ctx.fillStyle = "black";
             ctx.fillText("Game over!", this.canvas.width / 2, 35, 400);
             ctx.fillText(`Total score: ${this.score}`, this.canvas.width / 2, 135, 400);
+            ctx.fillText(`High score: ${this.highScore}`, this.canvas.width / 2, 185, 400);
+            ctx.fillText("Press SPACE to try again", this.canvas.width / 2, 285, 400);
         } else {
             // Draw score counter
             ctx.fillRect(this.canvas.width / 2 - 100, 10, 200, 70);
@@ -148,6 +151,9 @@ class Game {
 
     private end_game() {
         if (!this.gameOver) {
+            if (this.score > this.highScore) {
+                this.highScore = this.score;
+            }
             this.flash.flash();
             this.gameOver = true;
         }
@@ -159,10 +165,23 @@ class Game {
             if (!this.gameStarted) {
                 this.gameStarted = true;
                 this.joe.jump();
-            } else if (!this.gameOver) {
+            } else if (this.gameOver) {
+                // Restart the game
+                this.reset();
+            } else {
                 this.joe.jump();
             }
         }
+    }
+
+    private reset() {
+        this.background.reset();
+        this.floor.reset();
+        this.joe.reset(this);
+        this.joe.jump();
+        this.obstacles = [];
+        this.score = 0;
+        this.gameOver = false;
     }
 }
 
@@ -203,6 +222,11 @@ class ScrollingObject extends RectangularObject {
         super(x, y, width, height);
         this.texture = texture;
         this.vx = vx;
+    }
+
+    /** Reset the texture offset to 0. */
+    public reset() {
+        this.offsetX = 0;
     }
 
     public draw(game: Game) {
@@ -302,6 +326,11 @@ class Joe extends RectangularObject {
     constructor(game: Game, texture: HTMLImageElement) {
         super(200, game.floor_y / 2 - Joe.HEIGHT / 2, Joe.WIDTH, Joe.HEIGHT);
         this.texture = texture;
+    }
+
+    public reset(game: Game) {
+        this.y = game.floor_y / 2 - Joe.HEIGHT / 2;
+        this.vy = 0;
     }
 
     public draw(game: Game) {
